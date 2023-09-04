@@ -85,6 +85,19 @@ public class AppDbContext : DbContext, IAppDbContext
                 .HasForeignKey(e => e.UserId);
         });
 
+        modelBuilder.Entity<ArticleRating>(b =>
+        {
+            b.HasKey(e => new { e.ArticleId, e.UserId });
+
+            b.HasOne(e => e.Article)
+                .WithMany(e => e.UserRatings)
+                .HasForeignKey(e => e.ArticleId);
+
+            b.HasOne(e => e.User)
+                .WithMany(e => e.ArticleRatings)
+                .HasForeignKey(e => e.UserId);
+        });
+
         modelBuilder.Entity<FollowerUser>(b =>
         {
             b.HasKey(e => new { e.FollowingId, e.FollowerId });

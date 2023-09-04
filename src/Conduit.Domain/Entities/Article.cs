@@ -9,6 +9,7 @@ public class Article : IAuditableEntity
     private readonly List<Comment> _comments = new();
     private readonly List<ArticleTag> _tags = new();
     private readonly List<ArticleFavorite> _favoredUsers = new();
+    private readonly List<ArticleRating> _userRatings = new();
 
     public int Id { get; private set; }
 
@@ -37,6 +38,7 @@ public class Article : IAuditableEntity
     public virtual IReadOnlyCollection<ArticleTag> Tags => _tags;
 
     public virtual IReadOnlyCollection<ArticleFavorite> FavoredUsers => _favoredUsers;
+    public virtual IReadOnlyCollection<ArticleRating> UserRatings => _userRatings;
 
     public bool IsFavoritedBy(User user)
     {
@@ -88,4 +90,7 @@ public class Article : IAuditableEntity
                 .ToList()
         );
     }
+
+    public void RemoveRating(User user) => _userRatings.RemoveAll(x => x.UserId == user.Id);
+    public void AddRating(User user, int rating) => _userRatings.Add(new ArticleRating { User = user, Article = this, Rating = rating });
 }

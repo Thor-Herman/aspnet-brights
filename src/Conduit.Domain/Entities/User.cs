@@ -8,6 +8,7 @@ public class User : IAuditableEntity
 {
     private readonly List<Article> _articles = new();
     private readonly List<ArticleFavorite> _favoriteArticles = new();
+    private readonly List<ArticleRating> _articleRatings = new();
     private readonly List<Comment> _comments = new();
     private readonly List<FollowerUser> _following = new();
     private readonly List<FollowerUser> _followers = new();
@@ -35,6 +36,7 @@ public class User : IAuditableEntity
     public virtual IReadOnlyCollection<Article> Articles => _articles;
 
     public virtual IReadOnlyCollection<ArticleFavorite> FavoriteArticles => _favoriteArticles;
+    public virtual IReadOnlyCollection<ArticleRating> ArticleRatings => _articleRatings;
 
     public virtual IReadOnlyCollection<Comment> Comments => _comments;
 
