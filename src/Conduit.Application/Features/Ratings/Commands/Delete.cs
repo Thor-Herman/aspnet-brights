@@ -26,9 +26,6 @@ public class RatingDeleteHandler : IRequestHandler<RatingDeleteCommand>
 
         if (rating == null)
             throw new NotFoundException(nameof(rating));
-        if (rating.UserId != _currentUser.User!.Id)
-            throw new ForbiddenException();
-
         article.RemoveRating(_currentUser.User!);
 
         await _context.SaveChangesAsync(cancellationToken);

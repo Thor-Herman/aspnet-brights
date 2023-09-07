@@ -1,12 +1,12 @@
-
-using Conduit.Application.Features.Articles.Commands;
 using Conduit.Application.Features.Articles.Queries;
 using Conduit.Application.Features.Ratings.Commands;
 using Conduit.Application.Features.Ratings.Queries;
+using Conduit.Domain.Entities;
 
 using MediatR;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Conduit.Presentation.Controllers;
@@ -31,21 +31,31 @@ public class RatingsController
     }
 
     [HttpPost(Name = "CreateArticleRating")]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
-    public Task<SingleArticleResponse> Create(string slug, [FromBody] NewRatingRequest request, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<SingleArticleResponse>> Create(string slug, [FromBody] NewRatingRequest request, CancellationToken cancellationToken)
     {
-        return _sender.Send(new RateArticleCommand(slug, request.Rating.Value), cancellationToken);
+        try
+        {
+            return await _sender.Send(new RateArticleCommand(slug, request.Rating.Value), cancellationToken);
+        }
+        catch (InvalidOperationException)
+        {
+            return new ConflictResult();
+        }
     }
 
     [HttpDelete(Name = "DeleteArticleRating")]
-    [ProducesResponseType(204)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), 404)]
-    public Task DeleteRating(string slug, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteRating(string slug, CancellationToken cancellationToken)
     {
-        return _sender.Send(new RatingDeleteCommand(slug), cancellationToken);
+        await _sender.Send(new RatingDeleteCommand(slug), cancellationToken);
+        return new NoContentResult();
     }
-
 }
 
 public record NewRatingRequest(NewRatingDto Rating);

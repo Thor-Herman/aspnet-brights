@@ -37,6 +37,9 @@ public class ArticleRateHandler : IRequestHandler<RateArticleCommand, SingleArti
         var article = await _context.Articles
             .FindAsync(x => x.Slug == request.Slug, cancellationToken);
 
+        if (article.UserRatings.Any(a => a.UserId == _currentUser.User!.Id))
+            throw new InvalidOperationException("You have already rated this article.");
+
         article.AddRating(_currentUser.User!, request.Rating);
 
         await _context.SaveChangesAsync(cancellationToken);
