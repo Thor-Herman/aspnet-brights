@@ -48,7 +48,7 @@ public class RatingsController
     }
 
     [HttpDelete(Name = "DeleteArticleRating")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteRating(string slug, CancellationToken cancellationToken)
