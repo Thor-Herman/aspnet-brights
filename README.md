@@ -3,20 +3,20 @@ Ratings System
 This repo is a fork of [Realworld app](https://github.com/adr1enbe4udou1n/aspnetcore-realworld-example-app) intended for a brights course on dotnet. 
 
 ## Table of Contents
-- [Project Setup](project-setup)
-  - [Prerequisities](prerequisites)
-  - [Start the app](start-the-app)
-- [Data Model](data-model)
-  - [Rating Model](rating-model)
-  - [Relations](relations)
-  - [Migrations](migrations)
-- [Controller](controller)
-  - [End Points](end-points)
-  - [Create Rating](create-ratings)
-  - [List Ratings](list-ratings)
-  - [Delete Rating](delete-ratings)
-  - [Data Transfer Objects](data-transfer-objects)
-- [Further Work](further-work)
+- [Project Setup](#project-setup)
+  - [Prerequisities](#prerequisites)
+  - [Start the app](#start-the-app)
+- [Data Model](#data-model)
+  - [Rating Model](#rating-model)
+  - [Relations](#relations)
+  - [Migrations](#migrations)
+- [Controller](#controller)
+  - [End Points](#end-points)
+  - [Create Rating](#create-ratings)
+  - [List Ratings](#list-ratings)
+  - [Delete Rating](#delete-ratings)
+  - [Data Transfer Objects](#data-transfer-objects)
+- [Further Work](#further-work)
 
 ## Project Setup
 
