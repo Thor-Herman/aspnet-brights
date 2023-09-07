@@ -46,12 +46,14 @@ Start by reviewing the existing methods and endpoint in Swagger, and then try to
 
 <details closed>
     <summary><b>Explanation</b></summary>
-    The solution (**Realworld.sln<**) is divided into several smaller projects that handle different responsibilities
-    - _Conduit.Application_ contains the commands and queries that define the functionality. All interfaces can be found here too.
-    - _Conduit.Domain_ has the definitions for the database entities
-    - _Conduit.Presentation_ defines the end points and controllers that handle incoming requests. It also sets up Swagger in the ServiceExtension 
-    - _Conduit.Infrastructure_ contains the DbContext and utility classes such as a PasswordHasher
-    - _Conduit.WebUI_ is the entry point of the application. The `Program.cs` is located here together with various application settings.
+    The solution (<b>Realworld.sln</b>) is divided into several smaller projects that handle different responsibilities
+    <ul>
+      <li><i>Conduit.Application</i> contains the commands and queries that define the functionality. All interfaces can be found here too.</li>
+      <li><i>Conduit.Domain</i> has the definitions for the database entities</li>
+      <li><i>Conduit.Presentation</i> defines the end points and controllers that handle incoming requests. It also sets up Swagger in the ServiceExtension</li>
+      <li><i>Conduit.Infrastructure</i> contains the DbContext and utility classes such as a PasswordHasher</li>
+      <li><i>Conduit.WebUI</i> is the entry point of the application. The `Program.cs` is located here together with various application settings.</li>
+    </ul>
     The main pattern used is CQRS, which you can read more about <a href="https://code-maze.com/cqrs-mediatr-fluentvalidation/" target="_blank">here</a>
 </details>
 <br/>
@@ -97,7 +99,7 @@ With the class and its properties defined, its relations to other entites must a
     <summary><b>Solution</b></summary>
     Here is a possible solution that implements the relation presented previously. 
     
-    In _AppDbContext.cs_:
+In _AppDbContext.cs_:
 
 ```diff
     ...
@@ -115,7 +117,7 @@ With the class and its properties defined, its relations to other entites must a
     ...
 ```
 
-    In _User.cs_
+In _User.cs_
 
 ```diff
     ...
@@ -126,7 +128,7 @@ With the class and its properties defined, its relations to other entites must a
 +   public virtual IReadOnlyCollection<ArticleRating> ArticleRatings => _articleRatings;
 ```
 
-    In _Article.cs_
+In _Article.cs_
 
 ```diff
     ...
@@ -175,7 +177,8 @@ At the url `http://localhost:5000/api/articles/{article_slug}/ratings`
 
 <details closed>
     <summary><b>Solution</b></summary>
-    _In RatingsController.cs_
+
+_In RatingsController.cs_
     
 ```csharp
 using Conduit.Application.Features.Ratings.Commands;
@@ -221,7 +224,8 @@ Now that we have a skeleton for the incoming requests, it´s time to implement t
 
 <details closed>
     <summary><b>Solution</b></summary>
-    In _RatingsController.cs_
+
+In _RatingsController.cs_
 
 ```diff
 +using Conduit.Application.Features.Articles.Queries;
@@ -260,7 +264,7 @@ public class RatingsController
 +public record NewRatingRequest(int Rating);
 ```
 
-    In _Ratings/Commands/Create.cs_
+In _Ratings/Commands/Create.cs_
 
 ```csharp
 using Conduit.Application.Extensions;
@@ -318,7 +322,8 @@ Modify the list endpoint so that it returns all the ratings for a given article.
 
 <details closed>
     <summary><b>Solution</b></summary>
-    In _RatingsController.cs_
+
+In _RatingsController.cs_
     
 ```diff
 ...
@@ -331,18 +336,17 @@ using MediatR;
 public class RatingsController
 {
 ...
-[HttpGet(Name = "ListArticleRatings")]
-
-- [AllowAnonymous]
-- public Task<IReadonlyCollection<ArticleRating>> List(string slug, CancellationToken cancellationToken)
-- {
--        return _sender.Send(new RatingsListQuery(slug), cancellationToken);
-- }
-  ...
+  [HttpGet(Name = "ListArticleRatings")]
++ [AllowAnonymous]
++ public Task<IReadonlyCollection<ArticleRating>> List(string slug, CancellationToken cancellationToken)
+  {
++        return _sender.Send(new RatingsListQuery(slug), cancellationToken);
   }
-
+  ...
+}
 ```
-    In _Ratings/Queries/List.cs_
+
+In _Ratings/Queries/List.cs_
 
 ```csharp
 using Conduit.Application.Extensions;
@@ -381,7 +385,8 @@ Opinions can change over time, and perhaps an article you rated a 5 one year ago
 
 <details closed>
     <summary><b>Solution</b></summary>
-    In _Ratings/Commands/Delete.cs_
+
+In _Ratings/Commands/Delete.cs_
 
 ```csharp
 using Conduit.Application.Exceptions;
@@ -424,9 +429,9 @@ In _RatingsController.cs_
 ```diff
      ...
      [HttpDelete(Name = "DeleteArticleRating")]
-    +[ProducesResponseType(StatusCodes.Status204NoContent)]
-    +[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    +[ProducesResponseType(StatusCodes.Status404NotFound)]
++    [ProducesResponseType(StatusCodes.Status204NoContent)]
++    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
++    [ProducesResponseType(StatusCodes.Status404NotFound)]
      public async Task DeleteRating(string slug, CancellationToken cancellationToken)
      {
         +await _sender.Send(new RatingDeleteCommand(slug), cancellationToken);
@@ -443,9 +448,10 @@ To improve the security of our application, and not expose all the fields of the
 
 <details closed>
     <summary><b>Solution</b></summary>
-    In _Ratings/Queries/List.cs_
+
+In _Ratings/Queries/List.cs_
     
-```csharp
+```diff
 using Conduit.Application.Extensions;
 +using Conduit.Application.Features.Auth.Queries;
 +using Conduit.Application.Features.Profiles.Queries;
@@ -456,25 +462,25 @@ using Conduit.Domain.Entities;
 +public class RatingDto
 +{
 
-- public required int Value { get; set; }
-- public DateTime CreatedAt { get; set; }
-- public DateTime UpdatedAt { get; set; }
-- public required ProfileDto Author { get; set; }
++ public required int Value { get; set; }
++ public DateTime CreatedAt { get; set; }
++ public DateTime UpdatedAt { get; set; }
++ public required ProfileDto Author { get; set; }
   +}
 
 +public static class RatingDtoMapper
 +{
 
-- public static RatingDto Map(ArticleRating rating, User? user)
-- {
--        return new()
--        {
--            Value = rating.Rating,
--            CreatedAt = rating.CreatedAt,
--            UpdatedAt = rating.UpdatedAt,
--            Author = rating.User.MapToProfile(user),
--        };
-- }
++ public static RatingDto Map(ArticleRating rating, User? user)
++ {
++        return new()
++        {
++            Value = rating.Rating,
++            CreatedAt = rating.CreatedAt,
++            UpdatedAt = rating.UpdatedAt,
++            Author = rating.User.MapToProfile(user),
++        };
++ }
   +}
 
 +public record MultipleRatingsResponse(IEnumerable<RatingDto> Ratings);
@@ -484,19 +490,19 @@ using Conduit.Domain.Entities;
 +public class RatingsListHandler : IRequestHandler<RatingsListQuery, MultipleRatingsResponse>
 +{
 
-- private readonly IAppDbContext \_context;
--
-- public RatingsListHandler(IAppDbContext context)
-- {
--        _context = context;
-- }
--
-- public async Task<MultipleRatingsResponse> Handle(RatingsListQuery request, CancellationToken cancellationToken)
-- {
--        var article = await _context.Articles.FindAsync(x => x.Slug == request.Slug, cancellationToken);
--        var ratings = article.UserRatings.Select(x => RatingDtoMapper.Map(x, x.User));
--        return new MultipleRatingsResponse(ratings);
-- }
+  private readonly IAppDbContext _context;
+ 
+  public RatingsListHandler(IAppDbContext context)
+  {
+         _context = context;
+  }
+ 
++ public async Task<MultipleRatingsResponse> Handle(RatingsListQuery request, CancellationToken cancellationToken)
+  {
+         var article = await _context.Articles.FindAsync(x => x.Slug == request.Slug, cancellationToken);
++         var ratings = article.UserRatings.Select(x => RatingDtoMapper.Map(x, x.User));
++         return new MultipleRatingsResponse(ratings);
+  }
   +}
 
 ```
@@ -512,21 +518,21 @@ In _Ratings/Commands/Create.cs_
     ...
 ```
 
-    In _RatingsController.cs_
+In _RatingsController.cs_
 
 ```diff
     ...
 +   public Task<MultipleRatingsResponse> List(string slug, CancellationToken cancellationToken)
-+   {
-+       return _sender.Send(new RatingsListQuery(slug), cancellationToken);
-+   }
+    {
+        return _sender.Send(new RatingsListQuery(slug), cancellationToken);
+    }
     ...
 +   public async Task<ActionResult<SingleArticleResponse>> Create(string slug, [FromBody] NewRatingRequest request, CancellationToken cancellationToken)
-+   {
-+       ...
+    {
+        ...
 +           return _sender.Send(new RateArticleCommand(slug, request.Rating.Value), cancellationToken);
-+       ...
-+   }
+        ...
+    }
     ...
 +   public record NewRatingRequest(NewRatingDto Rating);
 ```
