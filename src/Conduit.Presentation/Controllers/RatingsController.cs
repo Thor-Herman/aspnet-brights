@@ -46,7 +46,7 @@ public class RatingsController
     {
         try
         {
-            return await _sender.Send(new RateArticleCommand(slug, request.Rating.Value), cancellationToken);
+            return await _sender.Send(new RateArticleCommand(slug, request.Rating.Value, request.Rating.Description), cancellationToken);
         }
         catch (InvalidOperationException)
         {

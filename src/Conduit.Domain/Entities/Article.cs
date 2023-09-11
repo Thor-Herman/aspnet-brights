@@ -92,5 +92,5 @@ public class Article : IAuditableEntity
     }
 
     public void RemoveRating(User user) => _userRatings.RemoveAll(x => x.UserId == user.Id);
-    public void AddRating(User user, int rating) => _userRatings.Add(new ArticleRating { User = user, Article = this, Rating = rating });
+    public void AddRating(User user, int rating, string description) => _userRatings.Add(new ArticleRating { User = user, Article = this, Rating = rating, Description = description });
 }

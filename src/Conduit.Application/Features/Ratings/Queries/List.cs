@@ -15,6 +15,7 @@ public class RatingDto
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public required ProfileDto Author { get; set; }
+    public string? Description { get; set; }
 
 }
 public static class RatingDtoMapper
@@ -27,6 +28,7 @@ public static class RatingDtoMapper
             CreatedAt = rating.CreatedAt,
             UpdatedAt = rating.UpdatedAt,
             Author = rating.User.MapToProfile(user),
+            Description = rating.Description
         };
     }
 }

@@ -11,6 +11,7 @@ namespace Conduit.Application.Features.Ratings.Commands;
 public class NewRatingDto
 {
     public int Value { get; set; }
+    public string Description { get; set; } = "";
 }
 public class RatingCreateValidator : AbstractValidator<RateArticleCommand>
 {
@@ -19,7 +20,7 @@ public class RatingCreateValidator : AbstractValidator<RateArticleCommand>
         RuleFor(x => x.Rating).NotNull().NotEmpty().InclusiveBetween(1, 5);
     }
 }
-public record RateArticleCommand(string Slug, int Rating) : IRequest<SingleArticleResponse>;
+public record RateArticleCommand(string Slug, int Rating, string Description) : IRequest<SingleArticleResponse>;
 
 public class ArticleRateHandler : IRequestHandler<RateArticleCommand, SingleArticleResponse>
 {
@@ -40,7 +41,7 @@ public class ArticleRateHandler : IRequestHandler<RateArticleCommand, SingleArti
         if (article.UserRatings.Any(a => a.UserId == _currentUser.User!.Id))
             throw new InvalidOperationException("You have already rated this article.");
 
-        article.AddRating(_currentUser.User!, request.Rating);
+        article.AddRating(_currentUser.User!, request.Rating, request.Description);
 
         await _context.SaveChangesAsync(cancellationToken);
 
