@@ -1,7 +1,6 @@
 using Conduit.Application.Features.Articles.Queries;
 using Conduit.Application.Features.Ratings.Commands;
 using Conduit.Application.Features.Ratings.Queries;
-using Conduit.Domain.Entities;
 
 using MediatR;
 
@@ -21,6 +20,14 @@ public class RatingsController
     public RatingsController(ISender sender)
     {
         _sender = sender;
+    }
+
+
+    [HttpGet("stats", Name = "GetArticleRatingStats")]
+    [AllowAnonymous]
+    public Task<RatingStatsResponse> GetAverage(string slug, CancellationToken cancellationToken)
+    {
+        return _sender.Send(new RatingGetStatsQuery(slug), cancellationToken);
     }
 
     [HttpGet(Name = "ListArticleRatings")]
