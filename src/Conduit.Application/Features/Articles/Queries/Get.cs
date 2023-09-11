@@ -33,6 +33,7 @@ public class ArticleDto
     public bool Favorited { get; set; }
 
     public int FavoritesCount { get; set; }
+    public int RatingsCount { get; set; }
 }
 
 public static class ArticleMapper
@@ -49,8 +50,9 @@ public static class ArticleMapper
             UpdatedAt = article.UpdatedAt,
             Favorited = currentUser != null && currentUser.HasFavorite(article),
             FavoritesCount = article.FavoredUsers.Count,
+            RatingsCount = article.UserRatings.Count,
             Author = article.Author.MapToProfile(currentUser),
-            TagList = new Collection<string>(article.Tags.Select(t => t.Tag.Name).OrderBy(t => t).ToList())
+            TagList = new Collection<string>(article.Tags.Select(t => t.Tag.Name).OrderBy(t => t).ToList()),
         };
     }
 }
