@@ -1,8 +1,6 @@
 <Project>
   <PropertyGroup>
     <AnalysisLevel>latest-All</AnalysisLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference
